@@ -157,6 +157,8 @@ def call_agent(agent_name: str, prompt: str, day: int, dry_run: bool) -> str:
             [openclaw_cmd, "agent", "--agent", agent_name, "--message", prompt, "--json"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=300,
         )
         if result.returncode != 0:
