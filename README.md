@@ -197,20 +197,26 @@ Three OpenClaw agents share one MemClaw fleet and run every day for 14 simulated
 ## Repository Structure
 
 ```
-memclaw-longrun-fleet/
-├── simulate.py                     # 14-day simulation runner
-├── openclaw.json                   # Gateway config: model, agents, MCP server
+caura-long-run-fleet/
 ├── .env.example
+├── .gitignore
+├── LICENSE
+├── README.md
+├── requirements.txt
+├── openclaw.json                   # Gateway config: model, agents, MCP server
+├── simulate.py                     # 14-day simulation runner
 ├── agents/
 │   ├── sourcing-agent/
-│   │   ├── SOUL.md                 # Agent identity and behavioral constraints
-│   │   └── AGENTS.md               # Daily workflow and tool call rules
+│   │   ├── AGENTS.md               # Daily workflow and tool call rules
+│   │   └── SOUL.md                 # Agent identity and behavioral constraints
 │   ├── verification-agent/
-│   │   ├── SOUL.md
-│   │   └── AGENTS.md
+│   │   ├── AGENTS.md
+│   │   └── SOUL.md
 │   └── synthesis-agent/
-│       ├── SOUL.md
-│       └── AGENTS.md
+│       ├── AGENTS.md
+│       └── SOUL.md
+├── docs/
+│   └── images/                     # README screenshots, diagrams, and demo
 └── skills/
     └── memclaw-research-fleet.md   # Shared governance skill for all agents
 ```
@@ -316,8 +322,8 @@ A successful response returns the fleet object with its `fleet_id`. If you see a
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/caura-ai/memclaw-long-run-fleet.git
-cd memclaw-long-run-fleet
+git clone https://github.com/caura-ai/caura-long-run-fleet.git
+cd caura-long-run-fleet
 ```
 
 ### 2. Copy the gateway config
