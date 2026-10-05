@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PINNED_SHA = "b3ef955a6ac70c43652e1567770668af042721f1"
+PINNED_SHA = "80a733e68260e179fcdebcb988486de56d6bc747"
 
 
 def require(pattern: str, text: str, label: str, errors: list[str]) -> None:
