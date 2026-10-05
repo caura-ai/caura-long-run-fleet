@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "automation": "human-only",
+  "repository": "caura-ai/caura-long-run-fleet",
+  "items": [
+    {
+      "id": "description",
+      "status": "pending",
+      "expected": "Runnable multi-agent fleet showing shared, governed Caura memory: cross-agent recall, verification, contradiction handling, and auditable synthesis.",
+      "verify": "Compare the GitHub About description character-for-character."
+    },
+    {
+      "id": "topics",
+      "status": "pending",
+      "expected": [
+        "agent-memory",
+        "agentic-ai",
+        "ai-agents",
+        "caura",
+        "mcp",
+        "memory-management",
+        "multi-agent-systems",
+        "openclaw",
+        "shared-memory"
+      ],
+      "verify": "Confirm every expected topic is present in GitHub About; additional relevant topics are allowed."
+    },
+    {
+      "id": "social-preview",
+      "status": "pending",
+      "source": "docs/images/caura-long-run-fleet-hero.svg",
+      "expected_alt": "Caura long-run research fleet: three agents sharing one governed memory pool.",
+      "verify": "Export the source to GitHub's supported social-preview format, upload it in repository settings, and inspect the rendered preview."
+    }
+  ]
+}

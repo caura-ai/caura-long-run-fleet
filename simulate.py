@@ -1,12 +1,12 @@
 """
-14-day fleet simulation runner for the MemClaw Long-Run Research Fleet.
+14-day fleet simulation runner for the Caura Long-Run Research Fleet.
 
 Each simulated day:
   1. Sourcing Agent and Verification Agent run concurrently (threads)
   2. Synthesis Agent runs after both complete
   3. On Day 9: Sourcing Agent writes the $349 drift. The crystallizer only
      dedups near-duplicate memories to `archived` -- it never marks anything
-     `outdated`. The $299 -> `outdated` transition is done by MemClaw's async
+     `outdated`. The $299 -> `outdated` transition is done by Caura's async
      contradiction detector, so after Sourcing + Verification finish we poll
      GET /memories/{memory_id}/contradictions until detection_status is
      "completed" before letting Synthesis run.
@@ -25,17 +25,46 @@ import sys
 import threading
 import time
 from datetime import datetime
+from typing import Mapping, Optional
 
-import requests
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ModuleNotFoundError:
+    def load_dotenv() -> bool:
+        """Allow dependency-free validation and dry runs."""
+        return False
 
 load_dotenv()
 
+
+def read_compatible_env(
+    primary: str,
+    legacy: str,
+    default: str = "",
+    environ: Optional[Mapping[str, str]] = None,
+) -> str:
+    """Read a current setting, then its supported non-empty legacy alias.
+
+    A blank current value must not shadow a working legacy value. This mirrors
+    Caura's server and OpenClaw plugin precedence during the rename transition.
+    """
+    values = os.environ if environ is None else environ
+    return values.get(primary) or values.get(legacy) or default
+
+
 GATEWAY_URL = os.getenv("OPENCLAW_GATEWAY_URL", "http://127.0.0.1:18789")
-MEMCLAW_API_URL = os.getenv("MEMCLAW_API_URL", "https://memclaw.net/api/v1")
-MEMCLAW_API_KEY = os.getenv("MEMCLAW_API_KEY", "")
-MEMCLAW_TENANT_ID = os.getenv("MEMCLAW_TENANT_ID", "your_tenant_id_here")
-MEMCLAW_FLEET_ID = os.getenv("MEMCLAW_FLEET_ID", "fleet-longrun-research")
+CAURA_API_URL = read_compatible_env(
+    "CAURA_API_URL", "MEMCLAW_API_URL", "https://caura.ai/api/v1"  # legacy-name-ok: supported non-empty env fallback
+)
+CAURA_API_KEY = read_compatible_env(
+    "CAURA_API_KEY", "MEMCLAW_API_KEY"  # legacy-name-ok: supported non-empty env fallback
+)
+CAURA_TENANT_ID = read_compatible_env(
+    "CAURA_TENANT_ID", "MEMCLAW_TENANT_ID", "your_tenant_id_here"  # legacy-name-ok: supported non-empty env fallback
+)
+CAURA_FLEET_ID = read_compatible_env(
+    "CAURA_FLEET_ID", "MEMCLAW_FLEET_ID", "fleet-longrun-research"  # legacy-name-ok: supported non-empty env fallback
+)
 
 
 SOURCING_PROMPT_DAYS_1_8 = """\
@@ -44,9 +73,9 @@ Run your Day {day} data collection workflow exactly as defined in your AGENTS.md
 Today is Day {day}. The competitor price is $299/month.
 
 Execute all steps:
-1. Call memclaw_recall (query: "competitor pricing current", fleet_ids: ["fleet-longrun-research"], agent_id: "sourcing-agent", include_brief: true) -- omit status so both active and confirmed memories are visible
-2. Call memclaw_write with: content: "Competitor pricing page shows $299/month for the Pro plan as of Day {day}.", agent_id: "sourcing-agent", fleet_id: "fleet-longrun-research", visibility: "scope_team"
-3. Call memclaw_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], top_k: 3, agent_id: "sourcing-agent")
+1. Call caura_recall (query: "competitor pricing current", fleet_ids: ["fleet-longrun-research"], agent_id: "sourcing-agent", include_brief: true) -- omit status so both active and confirmed memories are visible
+2. Call caura_write with: content: "Competitor pricing page shows $299/month for the Pro plan as of Day {day}.", agent_id: "sourcing-agent", fleet_id: "fleet-longrun-research", visibility: "scope_team"
+3. Call caura_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], top_k: 3, agent_id: "sourcing-agent")
 
 Print each tool call response including memory IDs and enrichment metadata.
 """
@@ -57,11 +86,11 @@ Run your Day 9 data collection workflow.
 CRITICAL: The competitor has updated their pricing page. The new price is $349/month (was $299).
 
 Execute all steps:
-1. Call memclaw_recall (query: "competitor pricing current", fleet_ids: ["fleet-longrun-research"], agent_id: "sourcing-agent", include_brief: true) -- omit status so both active and confirmed memories are visible
-2. Call memclaw_write with: content: "Competitor pricing page now shows $349/month for the Pro plan. Price increased from $299. Observed Day 9.", agent_id: "sourcing-agent", fleet_id: "fleet-longrun-research", visibility: "scope_team"
-3. Call memclaw_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], top_k: 5, agent_id: "sourcing-agent")
+1. Call caura_recall (query: "competitor pricing current", fleet_ids: ["fleet-longrun-research"], agent_id: "sourcing-agent", include_brief: true) -- omit status so both active and confirmed memories are visible
+2. Call caura_write with: content: "Competitor pricing page now shows $349/month for the Pro plan. Price increased from $299. Observed Day 9.", agent_id: "sourcing-agent", fleet_id: "fleet-longrun-research", visibility: "scope_team"
+3. Call caura_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], top_k: 5, agent_id: "sourcing-agent")
 
-Print each tool call response. Note whether MemClaw flagged a contradiction automatically.
+Print each tool call response. Note whether Caura flagged a contradiction automatically.
 """
 
 SOURCING_PROMPT_DAYS_10_14 = """\
@@ -70,9 +99,9 @@ Run your Day {day} data collection workflow.
 Today is Day {day}. The competitor price remains $349/month.
 
 Execute all steps:
-1. Call memclaw_recall (query: "competitor pricing current", fleet_ids: ["fleet-longrun-research"], agent_id: "sourcing-agent", include_brief: true) -- omit status so both active and confirmed memories are visible
-2. Call memclaw_write with: content: "Competitor pricing page continues to show $349/month for the Pro plan as of Day {day}.", agent_id: "sourcing-agent", fleet_id: "fleet-longrun-research", visibility: "scope_team"
-3. Call memclaw_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], top_k: 3, agent_id: "sourcing-agent")
+1. Call caura_recall (query: "competitor pricing current", fleet_ids: ["fleet-longrun-research"], agent_id: "sourcing-agent", include_brief: true) -- omit status so both active and confirmed memories are visible
+2. Call caura_write with: content: "Competitor pricing page continues to show $349/month for the Pro plan as of Day {day}.", agent_id: "sourcing-agent", fleet_id: "fleet-longrun-research", visibility: "scope_team"
+3. Call caura_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], top_k: 3, agent_id: "sourcing-agent")
 
 Print each tool call response including memory IDs.
 """
@@ -83,10 +112,10 @@ Run your Day {day} verification workflow exactly as defined in your AGENTS.md.
 Today is Day {day}.
 
 Execute all steps:
-1. Call memclaw_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], filter_agent_id: "sourcing-agent", top_k: 5, agent_id: "verification-agent")
+1. Call caura_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], filter_agent_id: "sourcing-agent", top_k: 5, agent_id: "verification-agent")
 2. Print: "I see [N] memories about competitor pricing. Statuses: [list them]."
-3. Call memclaw_manage (op: "transition", memory_id: "[ID from recall result]", status: "confirmed") on the most recent active memory
-4. Call memclaw_write with your verification note (include memory ID and Day {day})
+3. Call caura_manage (op: "transition", memory_id: "[ID from recall result]", status: "confirmed") on the most recent active memory
+4. Call caura_write with your verification note (include memory ID and Day {day})
 
 {conflict_instruction}
 
@@ -104,8 +133,8 @@ Run your Day {day} daily intelligence brief workflow exactly as defined in your 
 Today is Day {day}.
 
 Execute all steps:
-1. Call memclaw_recall (query: "competitor pricing current status", fleet_ids: ["fleet-longrun-research"], top_k: 5, agent_id: "synthesis-agent", include_brief: true) -- omit status so both active and confirmed memories are visible; passing status: "active" would drop confirmed memories too
-2. Call memclaw_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], status: "outdated", top_k: 10, agent_id: "synthesis-agent")
+1. Call caura_recall (query: "competitor pricing current status", fleet_ids: ["fleet-longrun-research"], top_k: 5, agent_id: "synthesis-agent", include_brief: true) -- omit status so both active and confirmed memories are visible; passing status: "active" would drop confirmed memories too
+2. Call caura_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], status: "outdated", top_k: 10, agent_id: "synthesis-agent")
 3. Print: "Suppressed [N] outdated memories from brief."
 4. Produce the brief in this exact format:
 
@@ -123,7 +152,7 @@ Suppressed memories: [N] outdated $[old price] memories from Days 1-8
 [2-3 sentences based ONLY on active/confirmed memories]
 ---
 
-5. Call memclaw_write with brief metadata (memory_type: "outcome")
+5. Call caura_write with a brief-completion record. Omit memory_type so Caura classifies it; `outcome` is server-generated and cannot be supplied to caura_write.
 """
 
 
@@ -182,7 +211,7 @@ def call_agent(agent_name: str, prompt: str, day: int, dry_run: bool) -> str:
 
 
 MEMORY_ID_RE = re.compile(r'"(?:memory_)?id"\s*:\s*"([a-zA-Z0-9_-]{8,})"')
-# UUIDs are what MemClaw actually issues; prefer them over other id-shaped tokens
+# UUIDs are what Caura issues; prefer them over other id-shaped tokens.
 UUID_RE = re.compile(
     r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 )
@@ -192,7 +221,7 @@ def extract_memory_id_candidates(sourcing_reply: str) -> list:
     """Extract candidate memory IDs for the Day 9 write, best guess first.
 
     The sourcing reply contains IDs from three tool calls: a pre-write recall
-    (old $299 memories), the memclaw_write result (the new $349 memory we
+    (old $299 memories), the caura_write result (the new $349 memory we
     actually need), and a post-write recall. To find the write's ID rather
     than the first ID in the reply, anchor on the text after the last "349"
     mention (the write result and post-write recall both follow it), preferring
@@ -221,8 +250,10 @@ def wait_for_contradiction_detection(day: int, sourcing_reply: str, dry_run: boo
     label = f"Day {day:02d} | contradiction-detection"
 
     if dry_run:
-        log(label, f"DRY RUN -- would poll {MEMCLAW_API_URL}/memories/{{memory_id}}/contradictions")
+        log(label, f"DRY RUN -- would poll {CAURA_API_URL}/memories/{{memory_id}}/contradictions")
         return
+
+    import requests
 
     candidates = extract_memory_id_candidates(sourcing_reply)
     if not candidates:
@@ -233,8 +264,8 @@ def wait_for_contradiction_detection(day: int, sourcing_reply: str, dry_run: boo
     log(label, f"Candidate memory IDs (best guess first): {candidates}")
 
     headers = {"Content-Type": "application/json"}
-    if MEMCLAW_API_KEY:
-        headers["X-API-Key"] = MEMCLAW_API_KEY
+    if CAURA_API_KEY:
+        headers["X-API-Key"] = CAURA_API_KEY
 
     memory_id = candidates[0]
     log(label, f"Polling contradiction detection for memory {memory_id}...")
@@ -243,9 +274,9 @@ def wait_for_contradiction_detection(day: int, sourcing_reply: str, dry_run: boo
         time.sleep(5)
         try:
             resp = requests.get(
-                f"{MEMCLAW_API_URL}/memories/{memory_id}/contradictions",
+                f"{CAURA_API_URL}/memories/{memory_id}/contradictions",
                 headers=headers,
-                params={"tenant_id": MEMCLAW_TENANT_ID, "fleet_id": MEMCLAW_FLEET_ID},
+                params={"tenant_id": CAURA_TENANT_ID},
                 timeout=30,
             )
             if resp.ok and resp.json().get("detection_status") == "completed":
@@ -321,7 +352,7 @@ def run_day(day: int, dry_run: bool) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run the 14-day MemClaw fleet simulation")
+    parser = argparse.ArgumentParser(description="Run the 14-day Caura fleet simulation")
     parser.add_argument(
         "--start", type=int, default=1, metavar="DAY",
         help="Start from this day (default: 1)"
@@ -346,15 +377,17 @@ def main() -> None:
 
     days_to_run = args.days if args.days else list(range(args.start, args.end + 1))
 
-    print("\nMemClaw Long-Run Research Fleet -- 14-Day Simulation", flush=True)
+    print("\nCaura Long-Run Research Fleet -- 14-Day Simulation", flush=True)
     print(f"Gateway:    {GATEWAY_URL}", flush=True)
-    print(f"Fleet:      {MEMCLAW_FLEET_ID}", flush=True)
+    print(f"Fleet:      {CAURA_FLEET_ID}", flush=True)
     print(f"Days:       {days_to_run}", flush=True)
     print(f"Dry run:    {args.dry_run}", flush=True)
-    print(f"Contradiction detection endpoint: {MEMCLAW_API_URL}/memories/{{memory_id}}/contradictions", flush=True)
+    print(f"Contradiction detection endpoint: {CAURA_API_URL}/memories/{{memory_id}}/contradictions", flush=True)
     print(flush=True)
 
     if not args.dry_run:
+        import requests
+
         # Verify gateway is reachable before starting
         try:
             requests.get(f"{GATEWAY_URL}/health", timeout=5)

@@ -8,14 +8,14 @@
 ## Daily Workflow
 
 ### Step 1 — Get a governed brief
-Call memclaw_recall with default status filtering (omit `status` entirely — default recall already excludes `outdated`/`conflicted`/`archived`/`deleted` while keeping both `active` and `confirmed` memories). Passing `status: "active"` explicitly would drop every `confirmed` memory too, which defeats governance:
+Call `caura_recall` with default status filtering (omit `status` entirely — default recall already excludes `outdated`/`conflicted`/`archived`/`deleted` while keeping both `active` and `confirmed` memories). Passing `status: "active"` explicitly would drop every `confirmed` memory too, which defeats governance:
 { "query": "competitor pricing current status", "fleet_ids": ["fleet-longrun-research"], "top_k": 5, "agent_id": "synthesis-agent", "include_brief": true }
 
 ### Step 2 — Also recall outdated memories (for the log, NOT the brief)
-Call memclaw_recall:
+Call `caura_recall`:
 { "query": "competitor pricing", "fleet_ids": ["fleet-longrun-research"], "status": "outdated", "top_k": 10, "agent_id": "synthesis-agent" }
 
-Print: "Suppressed [N] outdated memories from brief. Statuses confirmed outdated by MemClaw's async contradiction detector."
+Print: "Suppressed [N] outdated memories from brief. Statuses confirmed outdated by Caura's async contradiction detector."
 
 ### Step 3 — Produce the Daily Brief
 Format your output exactly like this:
@@ -36,4 +36,7 @@ Suppressed memories: [N] outdated $[old price] memories from Days 1-8
 ---
 
 ### Step 4 — Write brief metadata to memory
-{ "content": "Daily brief produced for Day [N]. Key finding: competitor price is $[X]/month. [N] stale memories were suppressed by MemClaw governance.", "agent_id": "synthesis-agent", "fleet_id": "fleet-longrun-research", "visibility": "scope_team", "memory_type": "outcome" }
+Call `caura_write`:
+{ "content": "Daily brief produced for Day [N]. Key finding: competitor price is $[X]/month. [N] stale memories were suppressed by Caura governance.", "agent_id": "synthesis-agent", "fleet_id": "fleet-longrun-research", "visibility": "scope_team" }
+
+Omit `memory_type` so Caura classifies this write. `outcome` is a server-generated type and is not accepted by `caura_write`.

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="720" viewBox="0 0 1000 720" role="img" aria-labelledby="title desc">
+  <title id="title">Caura long-run fleet architecture</title>
+  <desc id="desc">OpenClaw routes work to sourcing, verification, and synthesis agents. Each uses Caura MCP tools against one governed fleet memory pool.</desc>
+  <rect width="1000" height="720" fill="#08070b"/>
+  <g font-family="Arial, sans-serif" text-anchor="middle">
+    <g fill="#14111b" stroke="#ff7a22" stroke-width="3">
+      <rect x="330" y="35" width="340" height="70" rx="14"/>
+      <rect x="70" y="180" width="240" height="90" rx="14"/>
+      <rect x="380" y="180" width="240" height="90" rx="14"/>
+      <rect x="690" y="180" width="240" height="90" rx="14"/>
+      <rect x="180" y="355" width="640" height="90" rx="14" stroke="#9d6cff"/>
+      <rect x="180" y="535" width="640" height="110" rx="22" stroke="#56d4c5"/>
+    </g>
+    <g fill="#fff">
+      <text x="500" y="78" font-size="26" font-weight="700">OpenClaw gateway</text>
+      <text x="190" y="220" font-size="22" font-weight="700">Sourcing agent</text>
+      <text x="190" y="247" font-size="16">collects and writes</text>
+      <text x="500" y="220" font-size="22" font-weight="700">Verification agent</text>
+      <text x="500" y="247" font-size="16">checks and confirms</text>
+      <text x="810" y="220" font-size="22" font-weight="700">Synthesis agent</text>
+      <text x="810" y="247" font-size="16">recalls and briefs</text>
+      <text x="500" y="393" font-size="24" font-weight="700">Caura MCP</text>
+      <text x="500" y="422" font-size="16">caura_write · caura_recall · caura_manage</text>
+      <text x="500" y="578" font-size="24" font-weight="700">fleet-longrun-research</text>
+      <text x="500" y="610" font-size="17">tenant isolation · provenance · lifecycle · contradiction detection</text>
+    </g>
+  </g>
+  <g stroke="#ddd6e8" stroke-width="3" fill="none">
+    <path d="M500 105 V145 H190 V180 M500 145 V180 M500 145 H810 V180"/>
+    <path d="M190 270 V315 H500 V355 M500 270 V355 M810 270 V315 H500"/>
+    <path d="M500 445 V535"/>
+  </g>
+</svg>
