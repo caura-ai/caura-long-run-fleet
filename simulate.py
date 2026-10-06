@@ -165,7 +165,9 @@ def call_agent(agent_name: str, prompt: str, day: int, dry_run: bool) -> str:
         import json as _json
         try:
             data = _json.loads(result.stdout)
-            reply = data.get("reply") or data.get("content") or data.get("text") or result.stdout
+            reply = (
+                data.get("reply") or data.get("content") or data.get("text") or result.stdout
+            ) if isinstance(data, dict) else result.stdout
         except _json.JSONDecodeError:
             reply = result.stdout
         log(label, f"Done ({len(reply)} chars)")
