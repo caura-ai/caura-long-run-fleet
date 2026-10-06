@@ -169,9 +169,7 @@ def call_agent(agent_name: str, prompt: str, day: int, dry_run: bool) -> str:
         except _json.JSONDecodeError:
             reply = result.stdout
         log(label, f"Done ({len(reply)} chars)")
-        print(f"\n{'-'*60}", flush=True)
-        print(f"[{label}] RESPONSE:\n{reply}", flush=True)
-        print(f"{'-'*60}\n", flush=True)
+        print(f"\n{'-'*60}\n[{label}] RESPONSE:\n{reply}\n{'-'*60}\n", flush=True)
         return reply
     except subprocess.TimeoutExpired:
         log(label, "ERROR: Agent timed out after 300s")
