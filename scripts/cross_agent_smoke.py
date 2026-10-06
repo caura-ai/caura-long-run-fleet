@@ -50,7 +50,7 @@ def main(argv: list[str] | None = None) -> int:
         "CAURA_API_KEY", "MEMCLAW_API_KEY"  # legacy-name-ok: supported non-empty env fallback
     )
     tenant_id = read_compatible_env(  # legacy-name-ok: supported non-empty env fallback
-        "CAURA_TENANT_ID", "MEMCLAW_TENANT_ID", "local"  # legacy-name-ok: supported non-empty env fallback
+        "CAURA_TENANT_ID", "MEMCLAW_TENANT_ID", "default"  # legacy-name-ok: supported non-empty env fallback
     )
     plan = request_plan(api_url, tenant_id, args.fleet_id, bool(api_key))
     print("Caura cross-agent smoke plan:")

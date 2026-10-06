@@ -73,9 +73,9 @@ Run your Day {day} data collection workflow exactly as defined in your AGENTS.md
 Today is Day {day}. The competitor price is $299/month.
 
 Execute all steps:
-1. Call caura_recall (query: "competitor pricing current", fleet_ids: ["fleet-longrun-research"], agent_id: "sourcing-agent", include_brief: true) -- omit status so both active and confirmed memories are visible
-2. Call caura_write with: content: "Competitor pricing page shows $299/month for the Pro plan as of Day {day}.", agent_id: "sourcing-agent", fleet_id: "fleet-longrun-research", visibility: "scope_team"
-3. Call caura_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], top_k: 3, agent_id: "sourcing-agent")
+1. Call caura_recall (query: "competitor pricing current", fleet_ids: ["{fleet_id}"], agent_id: "sourcing-agent", include_brief: true) -- omit status so both active and confirmed memories are visible
+2. Call caura_write with: content: "Competitor pricing page shows $299/month for the Pro plan as of Day {day}.", agent_id: "sourcing-agent", fleet_id: "{fleet_id}", visibility: "scope_team"
+3. Call caura_recall (query: "competitor pricing", fleet_ids: ["{fleet_id}"], top_k: 3, agent_id: "sourcing-agent")
 
 Print each tool call response including memory IDs and enrichment metadata.
 """
@@ -86,9 +86,9 @@ Run your Day 9 data collection workflow.
 CRITICAL: The competitor has updated their pricing page. The new price is $349/month (was $299).
 
 Execute all steps:
-1. Call caura_recall (query: "competitor pricing current", fleet_ids: ["fleet-longrun-research"], agent_id: "sourcing-agent", include_brief: true) -- omit status so both active and confirmed memories are visible
-2. Call caura_write with: content: "Competitor pricing page now shows $349/month for the Pro plan. Price increased from $299. Observed Day 9.", agent_id: "sourcing-agent", fleet_id: "fleet-longrun-research", visibility: "scope_team"
-3. Call caura_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], top_k: 5, agent_id: "sourcing-agent")
+1. Call caura_recall (query: "competitor pricing current", fleet_ids: ["{fleet_id}"], agent_id: "sourcing-agent", include_brief: true) -- omit status so both active and confirmed memories are visible
+2. Call caura_write with: content: "Competitor pricing page now shows $349/month for the Pro plan. Price increased from $299. Observed Day 9.", agent_id: "sourcing-agent", fleet_id: "{fleet_id}", visibility: "scope_team"
+3. Call caura_recall (query: "competitor pricing", fleet_ids: ["{fleet_id}"], top_k: 5, agent_id: "sourcing-agent")
 
 Print each tool call response. Note whether Caura flagged a contradiction automatically.
 """
@@ -99,9 +99,9 @@ Run your Day {day} data collection workflow.
 Today is Day {day}. The competitor price remains $349/month.
 
 Execute all steps:
-1. Call caura_recall (query: "competitor pricing current", fleet_ids: ["fleet-longrun-research"], agent_id: "sourcing-agent", include_brief: true) -- omit status so both active and confirmed memories are visible
-2. Call caura_write with: content: "Competitor pricing page continues to show $349/month for the Pro plan as of Day {day}.", agent_id: "sourcing-agent", fleet_id: "fleet-longrun-research", visibility: "scope_team"
-3. Call caura_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], top_k: 3, agent_id: "sourcing-agent")
+1. Call caura_recall (query: "competitor pricing current", fleet_ids: ["{fleet_id}"], agent_id: "sourcing-agent", include_brief: true) -- omit status so both active and confirmed memories are visible
+2. Call caura_write with: content: "Competitor pricing page continues to show $349/month for the Pro plan as of Day {day}.", agent_id: "sourcing-agent", fleet_id: "{fleet_id}", visibility: "scope_team"
+3. Call caura_recall (query: "competitor pricing", fleet_ids: ["{fleet_id}"], top_k: 3, agent_id: "sourcing-agent")
 
 Print each tool call response including memory IDs.
 """
@@ -112,7 +112,7 @@ Run your Day {day} verification workflow exactly as defined in your AGENTS.md.
 Today is Day {day}.
 
 Execute all steps:
-1. Call caura_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], filter_agent_id: "sourcing-agent", top_k: 5, agent_id: "verification-agent")
+1. Call caura_recall (query: "competitor pricing", fleet_ids: ["{fleet_id}"], filter_agent_id: "sourcing-agent", top_k: 5, agent_id: "verification-agent")
 2. Print: "I see [N] memories about competitor pricing. Statuses: [list them]."
 3. Call caura_manage (op: "transition", memory_id: "[ID from recall result]", status: "confirmed") on the most recent active memory
 4. Call caura_write with your verification note (include memory ID and Day {day})
@@ -133,15 +133,15 @@ Run your Day {day} daily intelligence brief workflow exactly as defined in your 
 Today is Day {day}.
 
 Execute all steps:
-1. Call caura_recall (query: "competitor pricing current status", fleet_ids: ["fleet-longrun-research"], top_k: 5, agent_id: "synthesis-agent", include_brief: true) -- omit status so both active and confirmed memories are visible; passing status: "active" would drop confirmed memories too
-2. Call caura_recall (query: "competitor pricing", fleet_ids: ["fleet-longrun-research"], status: "outdated", top_k: 10, agent_id: "synthesis-agent")
+1. Call caura_recall (query: "competitor pricing current status", fleet_ids: ["{fleet_id}"], top_k: 5, agent_id: "synthesis-agent", include_brief: true) -- omit status so both active and confirmed memories are visible; passing status: "active" would drop confirmed memories too
+2. Call caura_recall (query: "competitor pricing", fleet_ids: ["{fleet_id}"], status: "outdated", top_k: 10, agent_id: "synthesis-agent")
 3. Print: "Suppressed [N] outdated memories from brief."
 4. Produce the brief in this exact format:
 
 ---
 DAILY INTELLIGENCE BRIEF - Day {day}
 Generated by: synthesis-agent
-Memory pool: fleet-longrun-research
+Memory pool: {fleet_id}
 
 ## Competitor Pricing (Governed Recall)
 Current price: $[X]/month (source memory IDs: [list])
@@ -305,17 +305,23 @@ def run_day(day: int, dry_run: bool) -> None:
     print(f"{'='*60}\n", flush=True)
 
     if day <= 8:
-        sourcing_prompt = SOURCING_PROMPT_DAYS_1_8.format(day=day)
+        sourcing_prompt = SOURCING_PROMPT_DAYS_1_8.format(
+            day=day, fleet_id=CAURA_FLEET_ID
+        )
     elif day == 9:
-        sourcing_prompt = SOURCING_PROMPT_DAY_9
+        sourcing_prompt = SOURCING_PROMPT_DAY_9.format(fleet_id=CAURA_FLEET_ID)
     else:
-        sourcing_prompt = SOURCING_PROMPT_DAYS_10_14.format(day=day)
+        sourcing_prompt = SOURCING_PROMPT_DAYS_10_14.format(
+            day=day, fleet_id=CAURA_FLEET_ID
+        )
 
     conflict_instruction = VERIFICATION_CONFLICT_INSTRUCTION if day >= 9 else ""
     verification_prompt = VERIFICATION_PROMPT.format(
-        day=day, conflict_instruction=conflict_instruction
+        day=day,
+        fleet_id=CAURA_FLEET_ID,
+        conflict_instruction=conflict_instruction,
     )
-    synthesis_prompt = SYNTHESIS_PROMPT.format(day=day)
+    synthesis_prompt = SYNTHESIS_PROMPT.format(day=day, fleet_id=CAURA_FLEET_ID)
 
     # Sourcing and Verification run concurrently
     sourcing_result: dict = {}
@@ -376,6 +382,11 @@ def main() -> None:
     args = parser.parse_args()
 
     days_to_run = args.days if args.days else list(range(args.start, args.end + 1))
+    if not days_to_run:
+        parser.error("day selection is empty; ensure --start is not greater than --end")
+    invalid_days = [day for day in days_to_run if not 1 <= day <= 14]
+    if invalid_days:
+        parser.error(f"days must be between 1 and 14; got {invalid_days}")
 
     print("\nCaura Long-Run Research Fleet -- 14-Day Simulation", flush=True)
     print(f"Gateway:    {GATEWAY_URL}", flush=True)

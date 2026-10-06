@@ -72,6 +72,33 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("DRY RUN -- would poll", result.stdout)
         self.assertNotIn("Sending prompt to gateway", result.stdout)
 
+    def test_dry_run_uses_configured_fleet_id_in_every_prompt(self) -> None:
+        env = dict(os.environ)
+        env["CAURA_FLEET_ID"] = "configured-fleet"
+        result = subprocess.run(
+            [
+                sys.executable,
+                "simulate.py",
+                "--dry-run",
+                "--days",
+                "1",
+                "9",
+                "10",
+                "--delay",
+                "0",
+            ],
+            cwd=ROOT,
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('fleet_ids: ["configured-fleet"]', result.stdout)
+        self.assertIn('fleet_id: "configured-fleet"', result.stdout)
+        self.assertIn("Memory pool: configured-fleet", result.stdout)
+        self.assertNotIn('fleet_ids: ["fleet-longrun-research"]', result.stdout)
+
     def test_legacy_brand_gate_passes(self) -> None:
         result = subprocess.run(
             [sys.executable, "scripts/check_legacy_brand.py"],

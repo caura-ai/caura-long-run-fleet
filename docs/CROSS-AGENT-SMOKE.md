@@ -18,7 +18,7 @@ To execute against a running local Caura:
 
 ```bash
 CAURA_API_URL=http://127.0.0.1:8000/api/v1 \
-CAURA_TENANT_ID=local \
+CAURA_TENANT_ID=default \
 CAURA_SMOKE_ALLOW_NETWORK=true \
 python scripts/cross_agent_smoke.py --execute
 ```

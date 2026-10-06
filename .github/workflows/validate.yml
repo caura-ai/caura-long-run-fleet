@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           repository: caura-ai/caura
-          ref: b3ef955a6ac70c43652e1567770668af042721f1
+          ref: 5155a0a7194be899b379ce662f5fccbb57476251
           path: _contract/caura
           persist-credentials: false
       - run: python scripts/check_oss_contract.py --oss-root _contract/caura

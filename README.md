@@ -109,7 +109,7 @@ docker compose up -d
 
 curl -X POST "http://localhost:8000/api/v1/fleet" \
   -H "Content-Type: application/json" \
-  -d '{"tenant_id":"local","fleet_id":"fleet-longrun-research","display_name":"Long-Run Research Fleet"}'
+  -d '{"tenant_id":"default","fleet_id":"fleet-longrun-research","display_name":"Long-Run Research Fleet"}'
 ```
 
 ## Quickstart

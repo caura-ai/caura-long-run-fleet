@@ -1,6 +1,6 @@
 # Pinned Caura OSS contract verification
 
-The commands in this reference fleet were verified on 5 October 2026 against Caura OSS commit [`80a733e68260e179fcdebcb988486de56d6bc747`](https://github.com/caura-ai/caura/commit/80a733e68260e179fcdebcb988486de56d6bc747).
+The commands in this reference fleet were verified on 6 October 2026 against Caura OSS commit [`5155a0a7194be899b379ce662f5fccbb57476251`](https://github.com/caura-ai/caura/commit/5155a0a7194be899b379ce662f5fccbb57476251).
 
 Verified surfaces:
 

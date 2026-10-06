@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PINNED_SHA = "80a733e68260e179fcdebcb988486de56d6bc747"
+PINNED_SHA = "5155a0a7194be899b379ce662f5fccbb57476251"
 
 
 def require(pattern: str, text: str, label: str, errors: list[str]) -> None:
@@ -49,6 +49,13 @@ def main(argv: list[str] | None = None) -> int:
     responses = committed_text(oss, "core-api/src/core_api/openapi_responses.py")
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     smoke = (ROOT / "scripts/cross_agent_smoke.py").read_text(encoding="utf-8")
+    workflow = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8")
+    contract_doc = (ROOT / "docs/OSS-CONTRACT.md").read_text(encoding="utf-8")
+
+    if f"ref: {PINNED_SHA}" not in workflow:
+        errors.append("workflow checkout ref does not match PINNED_SHA")
+    if f"/commit/{PINNED_SHA}" not in contract_doc:
+        errors.append("OSS contract documentation does not match PINNED_SHA")
 
     require(r'app\.include_router\(fleet_router, prefix="/api/v1"\)', app, "fleet router prefix", errors)
     require(r'app\.include_router\(memories_router, prefix="/api/v1"\)', app, "memory router prefix", errors)
