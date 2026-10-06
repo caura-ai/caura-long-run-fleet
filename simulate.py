@@ -132,7 +132,7 @@ def log(label: str, msg: str) -> None:
     print(f"[{ts}] [{label}] {msg}", flush=True)
 
 
-def call_agent(agent_name: str, prompt: str, day: int, dry_run: bool) -> str:
+def call_agent(agent_name: str, prompt: str, day: int, dry_run: bool, agent_timeout: int) -> str:
     """Send a prompt to a named OpenClaw agent and return its reply."""
     import subprocess
 
@@ -157,7 +157,7 @@ def call_agent(agent_name: str, prompt: str, day: int, dry_run: bool) -> str:
             [openclaw_cmd, "agent", "--agent", agent_name, "--message", prompt, "--json"],
             capture_output=True,
             text=True,
-            timeout=300,
+            timeout=agent_timeout,
         )
         if result.returncode != 0:
             log(label, f"ERROR (exit {result.returncode}): {result.stderr[:500]}")
@@ -174,7 +174,7 @@ def call_agent(agent_name: str, prompt: str, day: int, dry_run: bool) -> str:
         print(f"{'-'*60}\n", flush=True)
         return reply
     except subprocess.TimeoutExpired:
-        log(label, "ERROR: Agent timed out after 300s")
+        log(label, f"ERROR: Agent timed out after {agent_timeout}s")
         sys.exit(1)
     except FileNotFoundError:
         log(label, "ERROR: 'openclaw' CLI not found in PATH")
@@ -268,7 +268,7 @@ def wait_for_contradiction_detection(day: int, sourcing_reply: str, dry_run: boo
     log(label, "WARNING: Contradiction detection did not confirm completion within 60s. Synthesis may run before the $299 memory is marked outdated.")
 
 
-def run_day(day: int, dry_run: bool) -> None:
+def run_day(day: int, dry_run: bool, agent_timeout: int) -> None:
     print(f"\n{'='*60}", flush=True)
     print(f"  SIMULATED DAY {day}", flush=True)
     print(f"{'='*60}\n", flush=True)
@@ -291,11 +291,13 @@ def run_day(day: int, dry_run: bool) -> None:
     verification_result: dict = {}
 
     def run_sourcing():
-        sourcing_result["reply"] = call_agent("sourcing-agent", sourcing_prompt, day, dry_run)
+        sourcing_result["reply"] = call_agent(
+            "sourcing-agent", sourcing_prompt, day, dry_run, agent_timeout
+        )
 
     def run_verification():
         verification_result["reply"] = call_agent(
-            "verification-agent", verification_prompt, day, dry_run
+            "verification-agent", verification_prompt, day, dry_run, agent_timeout
         )
 
     log(f"Day {day:02d}", "Starting Sourcing Agent and Verification Agent in parallel...")
@@ -315,7 +317,7 @@ def run_day(day: int, dry_run: bool) -> None:
 
     # Synthesis runs after both agents and, on Day 9, after contradiction detection resolves
     log(f"Day {day:02d}", "Starting Synthesis Agent...")
-    call_agent("synthesis-agent", synthesis_prompt, day, dry_run)
+    call_agent("synthesis-agent", synthesis_prompt, day, dry_run, agent_timeout)
 
     log(f"Day {day:02d}", "Day complete.\n")
 
@@ -341,6 +343,10 @@ def main() -> None:
     parser.add_argument(
         "--delay", type=float, default=2.0, metavar="SECONDS",
         help="Seconds to pause between days (default: 2)"
+    )
+    parser.add_argument(
+        "--agent-timeout", type=int, default=300, metavar="SECONDS",
+        help="Seconds before each agent call times out (default: 300)"
     )
     args = parser.parse_args()
 
@@ -376,7 +382,7 @@ def main() -> None:
                 sys.exit(1)
 
     for i, day in enumerate(days_to_run):
-        run_day(day, args.dry_run)
+        run_day(day, args.dry_run, args.agent_timeout)
         if i < len(days_to_run) - 1 and args.delay > 0:
             time.sleep(args.delay)
 
