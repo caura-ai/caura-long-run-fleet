@@ -456,6 +456,7 @@ python simulate.py --dry-run            # print all prompts without calling the 
 python simulate.py --start 9 --end 10  # resume from a specific day
 python simulate.py --days 1 9 10       # run specific days only
 python simulate.py --delay 0           # no pause between days
+python simulate.py --agent-timeout 600 # per-agent timeout in seconds (default: 300)
 ```
 
 <br/>
