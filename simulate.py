@@ -345,6 +345,11 @@ def main() -> None:
     args = parser.parse_args()
 
     days_to_run = args.days if args.days else list(range(args.start, args.end + 1))
+    if not days_to_run:
+        parser.error("day selection is empty; ensure --start is not greater than --end")
+    invalid_days = [day for day in days_to_run if not 1 <= day <= 14]
+    if invalid_days:
+        parser.error(f"days must be between 1 and 14; got {invalid_days}")
 
     print("\nMemClaw Long-Run Research Fleet -- 14-Day Simulation", flush=True)
     print(f"Gateway:    {GATEWAY_URL}", flush=True)
