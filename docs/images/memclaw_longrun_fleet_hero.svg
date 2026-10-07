@@ -1,27 +1,16 @@
-<svg width="100%" viewBox="0 0 1210 685" role="img" style="" xmlns="http://www.w3.org/2000/svg">
-  <title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">memclaw-longrun-fleet hero image</title>
-  <desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Dark hero banner with deep black-to-crimson-to-orange gradient background and white serif text reading "long-run research fleet"</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Caura long-run research fleet</title>
+  <desc id="desc">Compatibility image path for the Caura long-run research fleet.</desc>
   <defs>
-    <radialGradient id="glow-left" cx="0%" cy="80%" r="70%">
-      <stop offset="0%" stop-color="#C44A00" stop-opacity="1"/>
-      <stop offset="45%" stop-color="#7A1200" stop-opacity="0.85"/>
-      <stop offset="100%" stop-color="#050008" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="glow-right" cx="100%" cy="0%" r="55%">
-      <stop offset="0%" stop-color="#0A0830" stop-opacity="0.9"/>
-      <stop offset="60%" stop-color="#050008" stop-opacity="0.5"/>
-      <stop offset="100%" stop-color="#050008" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="glow-center" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#3D0800" stop-opacity="0.6"/>
-      <stop offset="100%" stop-color="#050008" stop-opacity="0"/>
+    <radialGradient id="left" cx="0" cy="1" r="1">
+      <stop offset="0" stop-color="#c44a00"/>
+      <stop offset=".55" stop-color="#5b120d" stop-opacity=".75"/>
+      <stop offset="1" stop-color="#050008" stop-opacity="0"/>
     </radialGradient>
   </defs>
-
-  <rect width="1200" height="675" fill="#050008" style="fill:rgb(5, 0, 8);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <rect width="1200" height="675" fill="url(#glow-left)" style="stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <rect width="1200" height="675" fill="url(#glow-right)" style="stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <rect width="1200" height="675" fill="url(#glow-center)" style="stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-  <text x="600" y="358" text-anchor="middle" dominant-baseline="central" font-family="Georgia, 'Times New Roman', serif" font-size="92" font-weight="700" letter-spacing="-1" fill="#FFFFFF" style="fill:rgb(255, 255, 255);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, &quot;Times New Roman&quot;, serif;font-size:92px;font-weight:700;text-anchor:middle;dominant-baseline:central">long-run research fleet</text>
+  <rect width="1200" height="675" fill="#050008"/>
+  <rect width="1200" height="675" fill="url(#left)"/>
+  <text x="72" y="90" fill="#ff9a51" font-family="Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="6">CAURA</text>
+  <text x="72" y="250" fill="#fff" font-family="Georgia, serif" font-size="74" font-weight="700">Long-run research fleet</text>
+  <text x="75" y="310" fill="#ddd6e8" font-family="Arial, sans-serif" font-size="27">This historical URL now serves the current Caura identity.</text>
 </svg>
