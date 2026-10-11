@@ -19,10 +19,10 @@
 
   "mcp_servers": [
     {
-      "name": "memclaw",
+      "name": "caura",
       "url": "http://localhost:8000/mcp",
       "headers": {
-        "X-API-Key": "${MEMCLAW_API_KEY}"
+        "X-API-Key": "${CAURA_API_KEY}"
       }
     }
   ],
@@ -30,7 +30,7 @@
   "agents": {
     "sourcing-agent": {
       "workspace": "workspace-sourcing-agent",
-      "description": "Scrapes and writes daily competitor pricing data to shared MemClaw pool"
+      "description": "Scrapes and writes daily competitor pricing data to the shared Caura pool"
     },
 
     "verification-agent": {
