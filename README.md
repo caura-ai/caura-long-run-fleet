@@ -213,7 +213,10 @@ Useful flags:
 python simulate.py --start 9 --end 10
 python simulate.py --days 1 9 10
 python simulate.py --delay 0
+python simulate.py --agent-timeout 600
 ```
+
+`--agent-timeout` sets how many seconds each agent call may run before the runner aborts (default 300).
 
 ## Compatibility identifiers
 
