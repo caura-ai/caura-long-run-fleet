@@ -237,7 +237,7 @@ These compatibility identifiers are not the active product name. Do not use the 
 - Never commit `.env` or live credentials; `.env` is ignored.
 - Use HTTPS for any hosted `CAURA_API_URL`.
 - Keep API keys in environment variables, not directly in `openclaw.json`.
-- Review the plugin installer response before piping it to a shell.
+- Review the downloaded plugin installer before running it.
 - Rotate any key exposed in terminal output, version history, or chat exports.
 
 ## Validation
